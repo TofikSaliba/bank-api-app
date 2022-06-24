@@ -1,27 +1,4 @@
 import nodemailer from "nodemailer";
-import { saveAccounts } from "./accounts-exports.js";
-import { loadUsers, saveUsers } from "./users-exports.js";
-
-export const createAPIKey = (newKey) => {
-  saveUsers([], newKey);
-  saveAccounts([], newKey);
-};
-
-export const checkAPIKey = (key) => {
-  if (!key) {
-    throw new Error("Must provide API key in query!");
-  }
-  const usersData = loadUsers();
-  if (usersData[key] === undefined) {
-    return false;
-  }
-  return true;
-};
-
-export const resetKey = (key) => {
-  saveUsers([], key);
-  saveAccounts([], key);
-};
 
 export const sendEmail = async (email, key) => {
   try {
