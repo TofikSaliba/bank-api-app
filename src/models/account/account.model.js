@@ -9,6 +9,6 @@ accountSchema.methods.instanceMethod = function () {
   console.log({ InstanceMethodsThis: this });
 };
 
-const Account = mongoose.model(" Account", accountSchema);
+const Account = mongoose.model("Account", accountSchema);
 
 export { Account };

@@ -55,10 +55,4 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-userSchema.virtual("accounts", {
-  ref: "Account",
-  localField: "_id",
-  foreignField: "owner",
-});
-
 export { userSchema };

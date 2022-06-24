@@ -226,8 +226,8 @@ export const setAccActivity = async (req, res) => {
     }
 
     account.isActive = req.body.isActive;
-
     await account.save();
+
     res.status(200).json({ message: "Successfully set activity!" });
   } catch (err) {
     res.status(400).json({ code: 400, message: err.message });

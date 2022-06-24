@@ -5,6 +5,7 @@ const accountSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "User",
   },
   cash: {
     type: Number,
@@ -13,6 +14,11 @@ const accountSchema = new mongoose.Schema({
   credit: {
     type: Number,
     default: 0,
+    validate(value) {
+      if (value < 0) {
+        throw new Error("credit must be a positive number!");
+      }
+    },
   },
   usersAccess: {
     type: [
