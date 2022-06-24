@@ -25,12 +25,18 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    minLength: 6,
   },
   passportID: {
     type: String,
     index: true,
     unique: true,
     required: true,
+    validate(value) {
+      if (value.length !== 10) {
+        throw new Error("Passport ID has to be exactly 10 in length!");
+      }
+    },
   },
   cash: {
     type: Number,
@@ -39,11 +45,6 @@ const userSchema = new mongoose.Schema({
   credit: {
     type: Number,
     default: 0,
-    validate(value) {
-      if (value < 0) {
-        throw new Error("credit must be a positive number!");
-      }
-    },
   },
   tokens: [
     {

@@ -38,10 +38,8 @@ export const updateCredit = async (req, res) => {
     }
 
     const creditDiff = req.body.newCredit - account.credit;
-
     account.credit = req.body.newCredit;
     await account.save();
-
     await updateUserCashAndCredit(req.user, 0, creditDiff);
 
     res.json({

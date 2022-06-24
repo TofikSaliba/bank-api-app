@@ -6,6 +6,11 @@ export const addUser = async (req, res) => {
     if (req.body.admin) {
       throw new Error("Cannot set admin to true by user!");
     }
+    if (req.body.credit || req.body.cash) {
+      throw new Error(
+        "Cannot set cash or credit! new user has no accounts yet."
+      );
+    }
     const newUser = await createUser(req.body);
     const token = await newUser.generateAuthToken();
     res.status(201).json({ newUser, token });
@@ -16,6 +21,9 @@ export const addUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
+    if (!req.body.email || !req.body.password) {
+      throw new Error("Must provide email and password!");
+    }
     const user = await User.findByCredentials(
       req.body.email,
       req.body.password
@@ -51,6 +59,9 @@ export const logoutAll = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
+    if (req.user.cash < 0) {
+      throw new Error("User is in dept cannot delete! take care of it first.");
+    }
     await req.user.remove();
     res.json({
       deletedUser: req.user,
@@ -62,7 +73,7 @@ export const deleteUser = async (req, res) => {
 
 export const getUserProfile = async (req, res) => {
   try {
-    res.json({ currentUser: req.user });
+    res.json({ requestedUser: req.user });
   } catch (err) {
     res.status(500).json({ code: 500, message: err.message });
   }

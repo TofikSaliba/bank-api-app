@@ -24,9 +24,6 @@ app.use(cors());
 app.use("/users", usersRouter);
 app.use("/accounts", accountsRouter);
 app.use("/admin", adminRouter);
-// app.use();
-
-// if (process.env.NODE_ENV === "production") {}
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));

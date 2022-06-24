@@ -1,19 +1,23 @@
 import mongoose from "mongoose";
-import { createAccount } from "../services/account.services.js";
+import {
+  createAccount,
+  removeAccount,
+  checkIfFound,
+  saveTransferChanges,
+  checkToAccountValid,
+} from "../services/account.services.js";
 import { updateUserCashAndCredit } from "../services/user.services.js";
 import { Account } from "../models/account/account.model.js";
 import { User } from "../models/user/user.model.js";
 
 export const addAccount = async (req, res) => {
   try {
-    const newAccount = await createAccount({
-      ...req.body,
-      owner: req.user._id,
-    });
-    req.user = await updateUserCashAndCredit(
-      req.user,
-      newAccount.cash,
-      newAccount.credit
+    const newAccount = await createAccount(
+      {
+        ...req.body,
+        owner: req.user._id,
+      },
+      req.user
     );
     res.status(201).json({ newAccount });
   } catch (err) {
@@ -34,12 +38,7 @@ export const deleteAccount = async (req, res) => {
       throw new Error("Cannot delete! Account is in dept.");
     }
 
-    await account.remove();
-    req.user = await updateUserCashAndCredit(
-      req.user,
-      -account.cash,
-      -account.credit
-    );
+    await removeAccount(account, req.user);
     res.status(202).json({ deletedAccount: account });
   } catch (err) {
     res.status(400).json({ code: 400, message: err.message });
@@ -48,23 +47,15 @@ export const deleteAccount = async (req, res) => {
 
 export const depositToAccount = async (req, res) => {
   try {
-    let account = await Account.findOne({
-      _id: mongoose.Types.ObjectId(req.body.accountID),
-      owner: req.user._id,
-    });
-    if (!account) {
-      account = await Account.findOne({
-        _id: mongoose.Types.ObjectId(req.body.accountID),
-        "usersAccess._id": req.user._id,
-      });
-      if (!account) {
-        throw new Error("Invalid account deposit attempt!");
-      }
-      req.user = await User.findById(account.owner);
-    }
+    const { account, user } = await checkIfFound(
+      req.body.accountID,
+      req.user,
+      "deposit"
+    );
+
     account.cash += req.body.amount;
     account.save();
-    req.user = await updateUserCashAndCredit(req.user, req.body.amount, 0);
+    await updateUserCashAndCredit(user, req.body.amount, 0);
     res
       .status(200)
       .json({ message: `Successfully deposited ${req.body.amount}!` });
@@ -75,23 +66,18 @@ export const depositToAccount = async (req, res) => {
 
 export const withdrawFromAccount = async (req, res) => {
   try {
-    let account = await Account.findOne({
-      _id: mongoose.Types.ObjectId(req.body.accountID),
-      owner: req.user._id,
-    });
-    if (!account) {
-      account = await Account.findOne({
-        _id: mongoose.Types.ObjectId(req.body.accountID),
-        "usersAccess._id": req.user._id,
-      });
-      if (!account) {
-        throw new Error("Invalid account withdraw attempt!");
-      }
-      req.user = await User.findById(account.owner);
+    const { account, user } = await checkIfFound(
+      req.body.accountID,
+      req.user,
+      "withdraw"
+    );
+    if (account.cash - req.body.amount < -account.credit) {
+      throw new Error("Insufficient funds! amount not available.");
     }
+
     account.cash -= req.body.amount;
     account.save();
-    req.user = await updateUserCashAndCredit(req.user, -req.body.amount, 0);
+    await updateUserCashAndCredit(user, -req.body.amount, 0);
     res
       .status(200)
       .json({ message: `Successfully withdrawed ${req.body.amount}!` });
@@ -102,40 +88,27 @@ export const withdrawFromAccount = async (req, res) => {
 
 export const transferToAccount = async (req, res) => {
   try {
-    let fromAccount = await Account.findOne({
-      _id: mongoose.Types.ObjectId(req.body.fromAccountID),
-      owner: req.user._id,
-    });
-    if (!fromAccount) {
-      fromAccount = await Account.findOne({
-        _id: mongoose.Types.ObjectId(req.body.fromAccountID),
-        "usersAccess._id": req.user._id,
-      });
-      if (!fromAccount) {
-        throw new Error("Invalid account transfer attempt!");
-      }
-      req.user = await User.findById(fromAccount.owner);
+    const { account, user } = await checkIfFound(
+      req.body.fromAccountID,
+      req.user,
+      "transfer"
+    );
+    if (account.cash - req.body.amount < -account.credit) {
+      throw new Error("Insufficient funds! amount not available.");
     }
 
-    const toAccount = await Account.findOne({
-      _id: mongoose.Types.ObjectId(req.body.toAccountID),
-    });
+    const fromAccount = account;
+    const { toAccount, toOwner } = await checkToAccountValid(
+      req.body.toAccountID
+    );
 
-    if (!toAccount) {
-      throw new Error("Invalid account transfer attempt!");
-    }
-
-    const toOwner = await User.findOne({
-      _id: mongoose.Types.ObjectId(toAccount.owner),
-    });
-
-    fromAccount.cash -= req.body.amount;
-    fromAccount.save();
-    req.user = await updateUserCashAndCredit(req.user, -req.body.amount, 0);
-
-    toAccount.cash += req.body.amount;
-    toAccount.save();
-    await updateUserCashAndCredit(toOwner, req.body.amount, 0);
+    await saveTransferChanges(
+      fromAccount,
+      toAccount,
+      req.body.amount,
+      user,
+      toOwner
+    );
 
     res
       .status(200)
@@ -159,25 +132,8 @@ export const grantAccess = async (req, res) => {
       throw new Error("Invalid granting account access attempt!");
     }
 
-    const toUser = await User.findOne({
-      _id: mongoose.Types.ObjectId(req.body.toUser),
-    });
+    await account.grantAccess(req.body.toUser);
 
-    if (!toUser) {
-      throw new Error("Invalid granting account access attempt!");
-    }
-
-    account.usersAccess.forEach((user) => {
-      if (user._id.toString() === toUser._id.toString()) {
-        throw new Error(
-          "Invalid granting account access attempt! User already has."
-        );
-      }
-    });
-
-    account.usersAccess = account.usersAccess.concat({ _id: toUser._id });
-
-    await account.save();
     res.status(200).json({ message: "Successfully granted access!" });
   } catch (err) {
     res.status(400).json({ code: 400, message: err.message });
@@ -190,24 +146,12 @@ export const removeAccess = async (req, res) => {
       _id: mongoose.Types.ObjectId(req.body.accountID),
       owner: req.user._id,
     });
-
     if (!account) {
       throw new Error("Invalid removing account access attempt!");
     }
 
-    const fromUser = await User.findOne({
-      _id: mongoose.Types.ObjectId(req.body.fromUser),
-    });
+    await account.removeAcess(req.body.fromUser);
 
-    if (!fromUser) {
-      throw new Error("Invalid removing account access attempt!");
-    }
-
-    account.usersAccess = account.usersAccess.filter((user) => {
-      return user._id.toString() !== fromUser._id.toString();
-    });
-
-    await account.save();
     res.status(200).json({ message: "Successfully removed access!" });
   } catch (err) {
     res.status(400).json({ code: 400, message: err.message });
