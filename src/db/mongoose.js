@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import "dotenv/config";
 
 mongoose.connect(
-  "mongodb+srv://tofiksaliba:YJeenwNBY1KxjDQI@tofik.x4r2a7e.mongodb.net/bank-api?retryWrites=true&w=majority",
+  `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@tofik.x4r2a7e.mongodb.net/bank-api?retryWrites=true&w=majority`,
   (error, mongoConnectionInstance) => {
     if (error) throw Error("Mongoose Connection!!, Error: " + error);
     if (!process.env.NODE_ENV) {

@@ -8,7 +8,6 @@ import {
 } from "../services/account.services.js";
 import { updateUserCashAndCredit } from "../services/user.services.js";
 import { Account } from "../models/account/account.model.js";
-import { User } from "../models/user/user.model.js";
 
 export const addAccount = async (req, res) => {
   try {
@@ -52,6 +51,9 @@ export const depositToAccount = async (req, res) => {
       req.user,
       "deposit"
     );
+    if (!account.isActive) {
+      throw new Error("Not allowed! Account is inactive.");
+    }
 
     account.cash += req.body.amount;
     account.save();
@@ -71,6 +73,10 @@ export const withdrawFromAccount = async (req, res) => {
       req.user,
       "withdraw"
     );
+    if (!account.isActive) {
+      throw new Error("Not allowed! Account is inactive.");
+    }
+
     if (account.cash - req.body.amount < -account.credit) {
       throw new Error("Insufficient funds! amount not available.");
     }
@@ -93,14 +99,19 @@ export const transferToAccount = async (req, res) => {
       req.user,
       "transfer"
     );
+    const { toAccount, toOwner } = await checkToAccountValid(
+      req.body.toAccountID
+    );
+
+    if (!account.isActive || !toAccount.isActive) {
+      throw new Error("Not allowed! Account is inactive.");
+    }
+
     if (account.cash - req.body.amount < -account.credit) {
       throw new Error("Insufficient funds! amount not available.");
     }
 
     const fromAccount = account;
-    const { toAccount, toOwner } = await checkToAccountValid(
-      req.body.toAccountID
-    );
 
     await saveTransferChanges(
       fromAccount,
@@ -131,6 +142,9 @@ export const grantAccess = async (req, res) => {
     ) {
       throw new Error("Invalid granting account access attempt!");
     }
+    if (!account.isActive) {
+      throw new Error("Not allowed! Account is inactive.");
+    }
 
     await account.grantAccess(req.body.toUser);
 
@@ -148,6 +162,9 @@ export const removeAccess = async (req, res) => {
     });
     if (!account) {
       throw new Error("Invalid removing account access attempt!");
+    }
+    if (!account.isActive) {
+      throw new Error("Not allowed! Account is inactive.");
     }
 
     await account.removeAcess(req.body.fromUser);
