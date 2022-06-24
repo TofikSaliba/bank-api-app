@@ -3,6 +3,9 @@ import { User } from "../models/user/user.model.js";
 
 export const addUser = async (req, res) => {
   try {
+    if (req.body.admin) {
+      throw new Error("Cannot set admin to true by user!");
+    }
     const newUser = await createUser(req.body);
     const token = await newUser.generateAuthToken();
     res.status(201).json({ newUser, token });
@@ -60,6 +63,22 @@ export const deleteUser = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     res.json({ currentUser: req.user });
+  } catch (err) {
+    res.status(500).json({ code: 500, message: err.message });
+  }
+};
+
+export const editProfile = async (req, res) => {
+  try {
+    const updates = Object.keys(req.body);
+    const allowed = ["name", "email", "password"];
+    const isValid = updates.every((update) => allowed.includes(update));
+    if (!isValid) {
+      throw new Error("Invalid updates");
+    }
+    updates.forEach((update) => (req.user[update] = req.body[update]));
+    await req.user.save();
+    res.json({ updatedUser: req.user });
   } catch (err) {
     res.status(500).json({ code: 500, message: err.message });
   }

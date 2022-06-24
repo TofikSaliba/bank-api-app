@@ -1,5 +1,5 @@
 import express from "express";
-import { auth } from "../middleware/auth.js";
+import { auth, adminAuth } from "../middleware/auth.js";
 
 import {
   addAccount,
@@ -14,13 +14,15 @@ import {
 
 const accountsRouter = express.Router();
 
-accountsRouter.post("/addAccount", auth, addAccount);
+accountsRouter.post("/addAccount", auth, adminAuth, addAccount);
+
+accountsRouter.put("/deposit", auth, adminAuth, depositToAccount);
+accountsRouter.put("/withdraw", auth, adminAuth, withdrawFromAccount);
+accountsRouter.put("/transfer", auth, adminAuth, transferToAccount);
+accountsRouter.put("/grantAccess", auth, adminAuth, grantAccess);
+accountsRouter.put("/removeAccess", auth, adminAuth, removeAccess);
+accountsRouter.put("/setActivity", auth, adminAuth, setAccActivity);
+
 accountsRouter.delete("/deleteAccount", auth, deleteAccount);
-accountsRouter.put("/deposit", auth, depositToAccount);
-accountsRouter.put("/withdraw", auth, withdrawFromAccount);
-accountsRouter.put("/transfer", auth, transferToAccount);
-accountsRouter.put("/grantAccess", auth, grantAccess);
-accountsRouter.put("/removeAccess", auth, removeAccess);
-accountsRouter.put("/setActivity", auth, setAccActivity);
 
 export { accountsRouter };

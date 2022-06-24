@@ -15,7 +15,14 @@ const accountSchema = new mongoose.Schema({
     default: 0,
   },
   usersAccess: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [
+      {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+      },
+    ],
     default: [],
   },
   isActive: {

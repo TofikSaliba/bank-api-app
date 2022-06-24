@@ -48,12 +48,19 @@ export const deleteAccount = async (req, res) => {
 
 export const depositToAccount = async (req, res) => {
   try {
-    const account = await Account.findOne({
+    let account = await Account.findOne({
       _id: mongoose.Types.ObjectId(req.body.accountID),
       owner: req.user._id,
     });
     if (!account) {
-      throw new Error("Invalid account deposit attempt!");
+      account = await Account.findOne({
+        _id: mongoose.Types.ObjectId(req.body.accountID),
+        "usersAccess._id": req.user._id,
+      });
+      if (!account) {
+        throw new Error("Invalid account deposit attempt!");
+      }
+      req.user = await User.findById(account.owner);
     }
     account.cash += req.body.amount;
     account.save();
@@ -68,12 +75,19 @@ export const depositToAccount = async (req, res) => {
 
 export const withdrawFromAccount = async (req, res) => {
   try {
-    const account = await Account.findOne({
+    let account = await Account.findOne({
       _id: mongoose.Types.ObjectId(req.body.accountID),
       owner: req.user._id,
     });
     if (!account) {
-      throw new Error("Invalid account withdraw attempt!");
+      account = await Account.findOne({
+        _id: mongoose.Types.ObjectId(req.body.accountID),
+        "usersAccess._id": req.user._id,
+      });
+      if (!account) {
+        throw new Error("Invalid account withdraw attempt!");
+      }
+      req.user = await User.findById(account.owner);
     }
     account.cash -= req.body.amount;
     account.save();
@@ -88,12 +102,19 @@ export const withdrawFromAccount = async (req, res) => {
 
 export const transferToAccount = async (req, res) => {
   try {
-    const fromAccount = await Account.findOne({
+    let fromAccount = await Account.findOne({
       _id: mongoose.Types.ObjectId(req.body.fromAccountID),
       owner: req.user._id,
     });
     if (!fromAccount) {
-      throw new Error("Invalid account transfer attempt!");
+      fromAccount = await Account.findOne({
+        _id: mongoose.Types.ObjectId(req.body.fromAccountID),
+        "usersAccess._id": req.user._id,
+      });
+      if (!fromAccount) {
+        throw new Error("Invalid account transfer attempt!");
+      }
+      req.user = await User.findById(fromAccount.owner);
     }
 
     const toAccount = await Account.findOne({
@@ -155,6 +176,7 @@ export const grantAccess = async (req, res) => {
     });
 
     account.usersAccess = account.usersAccess.concat({ _id: toUser._id });
+
     await account.save();
     res.status(200).json({ message: "Successfully granted access!" });
   } catch (err) {

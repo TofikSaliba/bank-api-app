@@ -6,6 +6,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  admin: {
+    type: Boolean,
+    default: false,
+    immutable: true,
+  },
   email: {
     type: String,
     index: true,
