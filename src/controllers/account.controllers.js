@@ -11,6 +11,14 @@ import { Account } from "../models/account/account.model.js";
 
 export const addAccount = async (req, res) => {
   try {
+    if (
+      (req.body.cash !== undefined &&
+        (isNaN(Number(req.body.cash)) || req.body.cash === "")) ||
+      (req.body.credit !== undefined &&
+        (isNaN(Number(req.body.credit)) || req.body.credit === ""))
+    ) {
+      throw new Error("Cash and Credit must be numbers!");
+    }
     const newAccount = await createAccount(
       {
         ...req.body,
@@ -38,7 +46,7 @@ export const getAccounts = async (req, res) => {
 export const deleteAccount = async (req, res) => {
   try {
     const account = await Account.findOne({
-      _id: mongoose.Types.ObjectId(req.body.accountID),
+      _id: mongoose.Types.ObjectId(req.params.id),
       owner: req.user._id,
     });
     if (!account) {

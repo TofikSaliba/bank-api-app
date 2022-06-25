@@ -25,6 +25,6 @@ accountsRouter.put("/grantAccess", auth, adminAuth, grantAccess);
 accountsRouter.put("/removeAccess", auth, adminAuth, removeAccess);
 accountsRouter.put("/setActivity", auth, adminAuth, setAccActivity);
 
-accountsRouter.delete("/deleteAccount", auth, deleteAccount);
+accountsRouter.delete("/deleteAccount/:id", auth, deleteAccount);
 
 export { accountsRouter };

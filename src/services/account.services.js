@@ -54,9 +54,11 @@ export const saveTransferChanges = async (
 ) => {
   fromAccount.cash -= amount;
   await fromAccount.save();
-  await updateUserCashAndCredit(user, -amount, 0);
 
   toAccount.cash += amount;
   await toAccount.save();
-  await updateUserCashAndCredit(toOwner, amount, 0);
+  if (user._id.toString() !== toOwner._id.toString()) {
+    await updateUserCashAndCredit(user, -amount, 0);
+    await updateUserCashAndCredit(toOwner, amount, 0);
+  }
 };
