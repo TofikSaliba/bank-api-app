@@ -68,20 +68,27 @@ credit: "credit",<br />
 
 ## Routs
 
-| Name               | Method           | path                  | Body params                                                                          | Auth token    |
-| ------------------ | ---------------- | --------------------- | ------------------------------------------------------------------------------------ | ------------- |
-| Create new user    | post             | /users/signUp         | name- string, email- string, password- string, passportID- string                    | false         |
-| login              | post             | /users/login          | -email- string, password- string                                                     | false         |
-| logout             | post             | /users/logout         | -                                                                                    | true          |
-| logout all devices | post             | /users/logoutAll      | -                                                                                    | true          |
-| User profile       | get              | /users/profile        | -                                                                                    | true          |
-| Update user        | patch            | /users/editProfile    | name- string, email- string, password- string, userID-for admin- string              | true or admin |
-| delete user        | delete           | /users/deleteUser     | userID-for admin- string                                                             | true or admin |
-| get users accounts | get              | /accounts/ownAccounts | -                                                                                    | true          |
-| add account        | put              | /accounts/addAccount  | accountId- string, true or admin, userID-for admin- string                           | true or admin |
-| deposit            | put              | /accounts/deposit     | accountID- string, amount- number, userID-for admin- string                          | true or admin |
-| withdraw           | put              | /accounts/withdraw    | accountID- string, amount- number, userID-for admin- string                          | true or admin |
-| transfer           | put              | /accounts/transfer    | fromAccountID- string, toAccountID- string, amount- number, userID-for admin- string | true or admin |
-| Account details    | put :point_left: | /accaount             | accountId- string                                                                    | true or admin |
-| User details       | put :point_left: | /user                 | user - string                                                                        | true or admin |
-| Update credit      | put              | /update_credit        | accountId- string, credit- number                                                    | true or admin |
+| Name                     | Method | path                        | Body params                                                                          | Auth token    |
+| ------------------------ | ------ | --------------------------- | ------------------------------------------------------------------------------------ | ------------- |
+| Create new user          | post   | /users/signUp               | name- string, email- string, password- string, passportID- string                    | false         |
+| login                    | post   | /users/login                | -email- string, password- string                                                     | false         |
+| logout                   | post   | /users/logout               | -                                                                                    | true          |
+| logout all devices       | post   | /users/logoutAll            | -                                                                                    | true          |
+| User profile             | get    | /users/profile              | -                                                                                    | true          |
+| Update user              | patch  | /users/editProfile          | name- string, email- string, password- string, userID-for admin- string              | true or admin |
+| delete user              | delete | /users/deleteUser           | userID-for admin- string                                                             | true or admin |
+| get users accounts       | get    | /accounts/ownAccounts       | -                                                                                    | true          |
+| add account              | put    | /accounts/addAccount        | accountId- string, true or admin, userID-for admin- string                           | true or admin |
+| deposit                  | put    | /accounts/deposit           | accountID- string, amount- number, userID-for admin- string                          | true or admin |
+| withdraw                 | put    | /accounts/withdraw          | accountID- string, amount- number, userID-for admin- string                          | true or admin |
+| transfer                 | put    | /accounts/transfer          | fromAccountID- string, toAccountID- string, amount- number, userID-for admin- string | true or admin |
+| grant access to account  | put    | /accounts/grantAccess       | accountID- string, toUser- string, userID-for admin- string                          | true or admin |
+| remove access to account | put    | /accounts/removeAccess      | accountID- string, fromUser- string, userID-for admin- string                        | true or admin |
+| set account activity     | put    | /accounts/setActivity       | accountID- string, isActive- boolean , userID-for admin- string                      | true or admin |
+| delete an account        | delete | /accounts/deleteAccount/:id | userID-for admin- string                                                             | true or admin |
+| update account credit    | patch  | /admin/updateCredit         | accountID- string, newCredit- number                                                 | admin         |
+| get all users            | get    | /admin/getAllUsers          | -                                                                                    | admin         |
+| filter all users         | get    | /admin/filterUsers          | min- number, max- number <strong>note must provide as query and not in body</strong> | admin         |
+| get all accounts         | get    | /admin/getAllAccounts       | -                                                                                    | admin         |
+| filter all accounts      | get    | /admin/filterAcccounts      | min- number, max- number <strong>note must provide as query and not in body</strong> | admin         |
+| filter active accounts   | get    | /admin/filterActiveAccounts | isActive- boolean <strong>note must provide as query and not in body</strong>        | admin         |
