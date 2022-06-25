@@ -129,7 +129,7 @@ function Profile() {
         accountID: accountID,
         amount: amount,
       });
-      updateAccount(accountID, amount);
+      updateAccount(accountID, amount, 0, "", true);
       setDepositPopup(false);
       setProccessAmount("");
       setError("");
@@ -152,7 +152,7 @@ function Profile() {
         accountID: accountID,
         amount: amount,
       });
-      updateAccount(accountID, -amount);
+      updateAccount(accountID, -amount, 0, "", true);
       setWithdrawPopup(false);
       setProccessAmount("");
       setError("");
