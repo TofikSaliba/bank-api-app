@@ -7,7 +7,8 @@
 }
 
 .loginForm h1 {
-  font-size: clamp(2rem, 4vw, 4rem);
+  font-size: clamp(4rem, 4vw, 8rem);
+  margin-bottom: 3rem;
 }
 
 .loginForm button {
@@ -15,7 +16,7 @@
   border-radius: 5px;
   background: seagreen;
   color: #fff;
-  font-size: 1.6rem;
+  font-size: 2.6rem;
 }
 
 .error {
@@ -35,7 +36,7 @@
 
 .inputAndLabel input {
   padding: 0.3rem 1rem;
-  font-size: 1.6rem;
+  font-size: 2.6rem;
   text-align: center;
   width: 100%;
   border: 1px solid #111;

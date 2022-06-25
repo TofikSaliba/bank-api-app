@@ -1,0 +1,60 @@
+.profileContainer {
+  display: grid;
+  grid-template-columns: 1.3fr 2fr;
+  width: 100%;
+}
+
+.userLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  font-size: clamp(1.4rem, 2vw, 3rem);
+  width: 100%;
+}
+
+.userLeft span {
+  font-weight: bold;
+}
+
+.accountsRight {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
+}
+
+.accountsRight h1 {
+  text-align: center;
+}
+
+.userAccounts {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2rem;
+  padding: 0 2rem;
+}
+
+@media (max-width: 650px) {
+  .profileContainer {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    /* text-align: center; */
+    gap: 4rem;
+  }
+  .userLeft {
+    width: 50%;
+  }
+}
+
+@media (max-width: 380px) {
+  .userLeft {
+    width: 240px;
+    gap: 1rem;
+  }
+
+  .userAccounts {
+    padding: 0;
+  }
+}
