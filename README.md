@@ -68,16 +68,15 @@ credit: "credit",<br />
 
 ## Routs
 
-| Name               | Method           | path             | Body params                                  | params         |
-| ------------------ | ---------------- | ---------------- | -------------------------------------------- | -------------- |
-| Create new user    | post             | /users/signUp    | name- string, email- string,                 | -              |
-|                    |                  |                  | password- string, passportID- string         | -              |
-| login              | post             | /users/login     | -email- string, password- string             | -              |
-| logout             | post             | /users/logout    | -                                            | -              |
-| logout all devices | post             | /users/logoutAll | -                                            | -              |
-| Deposit            | put              | /deposit         | accountId- string                            | amount- number |
-| Update credit      | put              | /update_credit   | accountId- string, credit- number            | amount- number |
-| Withdraw           | put              | /withdraw        | accountId- string, amount- number            | amount- number |
-| Transfer           | put              | /transfer        | payer- string, payee- string, amount- number | amount- number |
-| Account details    | put :point_left: | /accaount        | accountId- string                            | -              |
-| User details       | put :point_left: | /user            | user - string                                | -              |
+| Name               | Method           | path             | Body params                                                       | params         |
+| ------------------ | ---------------- | ---------------- | ----------------------------------------------------------------- | -------------- |
+| Create new user    | post             | /users/signUp    | name- string, email- string, password- string, passportID- string | -              |
+| login              | post             | /users/login     | -email- string, password- string                                  | -              |
+| logout             | post             | /users/logout    | -                                                                 | -              |
+| logout all devices | post             | /users/logoutAll | -                                                                 | -              |
+| Deposit            | put              | /deposit         | accountId- string                                                 | amount- number |
+| Update credit      | put              | /update_credit   | accountId- string, credit- number                                 | amount- number |
+| Withdraw           | put              | /withdraw        | accountId- string, amount- number                                 | amount- number |
+| Transfer           | put              | /transfer        | payer- string, payee- string, amount- number                      | amount- number |
+| Account details    | put :point_left: | /accaount        | accountId- string                                                 | -              |
+| User details       | put :point_left: | /user            | user - string                                                     | -              |
