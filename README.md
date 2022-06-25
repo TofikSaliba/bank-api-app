@@ -1,6 +1,8 @@
 # bank API - documentation
 
-## base URL - https://tofik-bank-app.herokuapp.com/
+## connected with react app(mine) - https://tofik-bank-app.herokuapp.com/
+
+## base URL to use API - https://tofik-bank-app.herokuapp.com + /admin || /users || accounts
 
 <br />
 <br />
@@ -37,27 +39,6 @@ headers: {<br />
 "Authorization": "here the token you get from signing up or logging in",<br />
 },<br />
 body: {<br />
-cash: "cash",<br />
-credit: "credit",<br />
-},<br />
-});<br />
-
-<br />
-<br />
-
-## To add accounts to users use end point: /addAccount
-
-### must provide in body user passport ID as passportID, cash as cash and credit as credit, credit and cash are optional, default will be set to 0.
-
-### example:
-
-fetch("https://tofik-bank-api.herokuapp.com/api/addAccount?apiKey={your-key}", {<br />
-method: "POST",<br />
-headers: {<br />
-"Content-Type": "application/json",<br />
-},<br />
-body: {<br />
-passportID: "pass ID",<br />
 cash: "cash",<br />
 credit: "credit",<br />
 },<br />
