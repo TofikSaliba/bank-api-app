@@ -2,7 +2,7 @@ import React from "react";
 
 import "./accountCard.css";
 
-function AccountCard({ account }) {
+function AccountCard({ account, children }) {
   return (
     <div className="accountCard">
       <div className="detail">
@@ -27,6 +27,7 @@ function AccountCard({ account }) {
           {account.usersAccess.length ? account.usersAccess.join(", ") : "none"}
         </span>
       </div>
+      <div className="accountCardChildren">{children}</div>
     </div>
   );
 }

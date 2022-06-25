@@ -36,6 +36,75 @@
   padding: 0 2rem;
 }
 
+.popUp {
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(0, 0, 0, 0.4);
+  text-align: center;
+  z-index: 20;
+}
+
+.deposit,
+.withdraw,
+.transfer,
+.addAccount {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  background: peru;
+  border-radius: 10px;
+}
+
+.deposit input,
+.withdraw input,
+.transfer input,
+.addAccount input {
+  border: 1px solid #111;
+  border-radius: 5px;
+  padding: 0.3rem 1rem;
+  text-align: center;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+}
+
+.deposit button,
+.withdraw button,
+.transfer button,
+.addAccount button,
+.addAccountBtn {
+  border: 1px solid #111;
+  border-radius: 5px;
+  padding: 0.3rem 1rem;
+  text-align: center;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  width: 50%;
+  align-self: center;
+}
+
+.transactionError {
+  color: red;
+  font-size: 1.2rem;
+  height: 10px;
+}
+
+.addAccountBtn {
+  width: max-content;
+  align-self: center;
+}
+
+.deleteAccount {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
+
 @media (max-width: 650px) {
   .profileContainer {
     grid-template-columns: 1fr;

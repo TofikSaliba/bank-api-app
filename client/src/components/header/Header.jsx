@@ -14,7 +14,7 @@ function Header() {
       const options = {
         headers: { Authorization: token },
       };
-      const { data } = await API(options).post("/users/logout");
+      await API(options).post("/users/logout");
     } catch (err) {
       console.log(err);
     } finally {

@@ -12,7 +12,7 @@ import API from "./api/api.js";
 import "./app.css";
 
 function App() {
-  const { currentUser, setCurrentUser, setToken } = useData();
+  const { setCurrentUser, setToken } = useData();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,6 +33,7 @@ function App() {
       getUser();
     }
     setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
