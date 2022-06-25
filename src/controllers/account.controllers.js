@@ -18,7 +18,18 @@ export const addAccount = async (req, res) => {
       },
       req.user
     );
+    req.user.accounts.push(newAccount._id);
+    await req.user.save();
     res.status(201).json({ newAccount });
+  } catch (err) {
+    res.status(400).json({ code: 400, message: err.message });
+  }
+};
+
+export const getAccounts = async (req, res) => {
+  try {
+    const accounts = await Account.find({ owner: req.user._id });
+    res.status(200).json({ accounts });
   } catch (err) {
     res.status(400).json({ code: 400, message: err.message });
   }
@@ -38,6 +49,10 @@ export const deleteAccount = async (req, res) => {
     }
 
     await removeAccount(account, req.user);
+    req.user.accounts = req.user.accounts.filter((acc) => {
+      return acc.toString() !== account._id.toString();
+    });
+    await req.user.save();
     res.status(202).json({ deletedAccount: account });
   } catch (err) {
     res.status(400).json({ code: 400, message: err.message });

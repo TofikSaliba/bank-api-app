@@ -46,6 +46,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  accounts: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
   tokens: [
     {
       token: {

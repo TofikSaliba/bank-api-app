@@ -6,7 +6,7 @@ import { updateUserCashAndCredit } from "./user.services.js";
 export const createAccount = async (account, user) => {
   const newAccount = new Account(account);
   await updateUserCashAndCredit(user, newAccount.cash, newAccount.credit);
-  await newAccount.save();
+  return await newAccount.save();
 };
 
 export const removeAccount = async (account, user) => {

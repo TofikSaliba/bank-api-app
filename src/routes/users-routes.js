@@ -18,7 +18,7 @@ usersRouter.post("/login", loginUser);
 usersRouter.post("/logout", auth, logoutUser);
 usersRouter.post("/logoutAll", auth, logoutAll);
 
-usersRouter.get("/profile", auth, adminAuth, getUserProfile);
+usersRouter.get("/profile", auth, getUserProfile);
 usersRouter.patch("/editProfile", auth, adminAuth, editProfile);
 
 usersRouter.delete("/deleteUser", auth, adminAuth, deleteUser);
