@@ -1,66 +1,57 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Header from "./components/header/Header";
+import Home from "./components/home/Home";
+import Profile from "./components/profile/Profile";
+import Login from "./components/login/Login";
+import Register from "./components/register/Register";
+
+import { useData } from "./contexts/DataContext";
+
+import API from "./api/api.js";
 import "./app.css";
 
 function App() {
-  const [key, setKey] = useState("");
-  const [email, setEmail] = useState("");
-  const [fetching, setFetching] = useState(false);
+  const { currentUser, setCurrentUser, setToken } = useData();
+  const [loading, setLoading] = useState(true);
 
-  const getKey = async (e) => {
-    e.preventDefault();
-    console.log(email);
-    if (email === "") {
-      setKey("Must enter email!");
-      return;
+  useEffect(() => {
+    const storedToken = JSON.parse(localStorage.getItem("bankToken"));
+    if (storedToken) {
+      const getUser = async () => {
+        try {
+          const options = {
+            headers: { Authorization: storedToken },
+          };
+          const { data } = await API(options).get("/users/profile");
+          setCurrentUser(data.requestedUser);
+          setToken(storedToken);
+        } catch (err) {
+          console.log(err.message);
+        }
+      };
+      getUser();
     }
-    if (fetching) return;
-    setFetching(true);
-    setKey("Generating...");
-    const url =
-      process.env.NODE_ENV === "production"
-        ? "/api"
-        : "http://localhost:5000/api";
-
-    const res = await fetch(url + "/getAPIKey", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-      }),
-    });
-    const data = await res.json();
-    setEmail("");
-    setFetching(false);
-    setKey(data.key);
-  };
+    setLoading(false);
+  }, []);
 
   return (
-    <div className="mainContainer">
-      <h2>Enter your email to get an API key</h2>
-      <form onSubmit={getKey}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <button type="submit">Get Key</button>
-      </form>
-      <div>{key}</div>
-      <div>Base API Url: https://tofik-bank-api.herokuapp.com/api</div>
-      <div>
-        For documentation check my Github wiki:{" "}
-        <a
-          href="https://github.com/TofikSaliba/bank-api"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Here
-        </a>
-      </div>
-    </div>
+    <>
+      <Router>
+        <Header />
+        <div className="mainContainer">
+          {loading && <h1>Loading</h1>}
+          {!loading && (
+            <Switch>
+              <Route exact path="/" component={Home} />
+              <Route exact path="/profile" component={Profile} />
+              <Route exact path="/Login" component={Login} />
+              <Route exact path="/Register" component={Register} />
+            </Switch>
+          )}
+        </div>
+      </Router>
+    </>
   );
 }
 
