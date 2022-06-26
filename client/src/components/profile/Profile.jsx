@@ -42,28 +42,23 @@ function Profile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateAccount = (
-    accID,
-    amount,
-    credit = 0,
-    toAcc = "",
-    second = false
-  ) => {
-    const newAccounts = userAccounts.map((acc) => {
-      if (acc._id === accID) {
-        acc.cash += amount;
-      }
-      return acc;
-    });
-
-    if (!currentUser.accounts.includes(toAcc) && second) {
-      setCurrentUser({
-        ...currentUser,
-        cash: currentUser.cash + amount,
-        credit: currentUser.credit + credit,
+  const updateAccount = (accID, amount) => {
+    setUserAccounts((prev) => {
+      return prev.map((acc) => {
+        if (acc._id === accID) {
+          acc.cash += amount;
+        }
+        return acc;
       });
-      setUserAccounts(newAccounts);
-    }
+    });
+  };
+
+  const updateCurrUser = (cashAmount = 0, creditAmount = 0) => {
+    setCurrentUser((prev) => ({
+      ...prev,
+      cash: prev.cash + cashAmount,
+      credit: prev.credit + creditAmount,
+    }));
   };
 
   const handleAddAccount = async () => {
@@ -77,9 +72,12 @@ function Profile() {
         cash: cash2 ?? 0,
         credit: credit2 ?? 0,
       });
-      const newUserAccounts = userAccounts.push(data.newAccount);
-      setUserAccounts(newUserAccounts);
-      updateAccount(accountID, cash2 ?? 0, credit2 ?? 0, "", true);
+      setUserAccounts((prev) => {
+        prev.push({ ...data.newAccount });
+        return prev;
+      });
+
+      updateCurrUser(cash2 ?? 0, credit2 ?? 0);
       setAddAccountPopup(false);
       setCash("");
       setCredit("");
@@ -97,18 +95,11 @@ function Profile() {
       const { data } = await API(options).delete(
         `/accounts/deleteAccount/${accountID}`
       );
-      const newUserAccounts = userAccounts.filter((acc) => {
-        return acc._id !== accountID;
-      });
 
-      updateAccount(
-        "",
-        -data.deletedAccount.cash,
-        -data.deletedAccount.credit,
-        "",
-        true
-      );
-      setUserAccounts(newUserAccounts);
+      setUserAccounts((prev) => {
+        return prev.filter((acc) => acc._id !== accountID);
+      });
+      updateCurrUser(-data.deletedAccount.cash, -data.deletedAccount.credit);
       setDeletePopup(false);
       setError("");
     } catch (err) {
@@ -130,7 +121,8 @@ function Profile() {
         accountID: accountID,
         amount: amount,
       });
-      updateAccount(accountID, amount, 0, "", true);
+      updateAccount(accountID, amount);
+      updateCurrUser(amount);
       setDepositPopup(false);
       setProccessAmount("");
       setError("");
@@ -153,7 +145,8 @@ function Profile() {
         accountID: accountID,
         amount: amount,
       });
-      updateAccount(accountID, -amount, 0, "", true);
+      updateAccount(accountID, -amount);
+      updateCurrUser(-amount);
       setWithdrawPopup(false);
       setProccessAmount("");
       setError("");
@@ -177,8 +170,12 @@ function Profile() {
         toAccountID: destinationID,
         amount: amount,
       });
-      updateAccount(accountID, -amount, 0, destinationID, true);
-      updateAccount(destinationID, amount, 0, destinationID);
+      updateAccount(accountID, -amount);
+      updateAccount(destinationID, amount);
+      const accountsIDs = userAccounts.map((acc) => acc._id);
+      if (!accountsIDs.includes(destinationID)) {
+        updateCurrUser(-amount);
+      }
       setTransferPopup(false);
       setProccessAmount("");
       setDestinationID("");

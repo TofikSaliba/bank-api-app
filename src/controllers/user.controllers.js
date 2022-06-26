@@ -25,7 +25,7 @@ export const loginUser = async (req, res) => {
       throw new Error("Must provide email and password!");
     }
     const user = await User.findByCredentials(
-      req.body.email,
+      req.body.email.toLowerCase(),
       req.body.password
     );
     const token = await user.generateAuthToken();
