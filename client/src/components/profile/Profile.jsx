@@ -55,6 +55,7 @@ function Profile() {
       }
       return acc;
     });
+
     if (!currentUser.accounts.includes(toAcc) && second) {
       setCurrentUser({
         ...currentUser,
