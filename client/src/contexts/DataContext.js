@@ -9,12 +9,15 @@ export function useData() {
 export function DataProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [isSpinning, setIsSpinning] = useState(true);
 
   const value = {
     currentUser,
     setCurrentUser,
     token,
     setToken,
+    isSpinning,
+    setIsSpinning,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

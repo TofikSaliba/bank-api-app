@@ -20,7 +20,14 @@ function Profile() {
   const [cash, setCash] = useState("");
   const [credit, setCredit] = useState("");
   const [error, setError] = useState("");
-  const { currentUser, setCurrentUser, setToken, token } = useData();
+  const {
+    currentUser,
+    setCurrentUser,
+    setToken,
+    token,
+    isSpinning,
+    setIsSpinning,
+  } = useData();
 
   useEffect(() => {
     if (currentUser) {
@@ -39,8 +46,12 @@ function Profile() {
       };
       getUserAccounts();
     }
+    setTimeout(() => {
+      setIsSpinning(false);
+    }, 1000);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentUser, isSpinning]);
 
   const updateAccount = (accID, amount) => {
     setUserAccounts((prev) => {
@@ -83,8 +94,7 @@ function Profile() {
       setCredit("");
       setError("");
     } catch (err) {
-      setError(err.response.data.message || err.message);
-      console.log(err);
+      handleError(err);
     }
   };
   const handleDeleteAccount = async () => {
@@ -103,8 +113,7 @@ function Profile() {
       setDeletePopup(false);
       setError("");
     } catch (err) {
-      setError(err.response.data.message || err.message);
-      console.log(err);
+      handleError(err);
     }
   };
 
@@ -127,8 +136,7 @@ function Profile() {
       setProccessAmount("");
       setError("");
     } catch (err) {
-      setError(err.response.data.message);
-      console.log(err);
+      handleError(err);
     }
   };
 
@@ -151,8 +159,7 @@ function Profile() {
       setProccessAmount("");
       setError("");
     } catch (err) {
-      setError(err.response.data.message);
-      console.log(err);
+      handleError(err);
     }
   };
 
@@ -181,8 +188,16 @@ function Profile() {
       setDestinationID("");
       setError("");
     } catch (err) {
-      setError(err.response.data.message);
-      console.log(err);
+      handleError(err);
+    }
+  };
+
+  const handleError = (err) => {
+    setError(err.response.data.message || err.message);
+    console.log(err);
+    if (err.response.status === 401) {
+      setCurrentUser(null);
+      setToken(null);
     }
   };
 
@@ -211,7 +226,7 @@ function Profile() {
     );
   };
 
-  const getUserAccounts = () => {
+  const getUserAccountsJSX = () => {
     return userAccounts.map((account) => {
       return (
         <AccountCard key={account._id} account={account}>
@@ -253,144 +268,168 @@ function Profile() {
     });
   };
 
-  if (!currentUser) {
-    return <Redirect to="/" />;
+  const getDeletePopupJSX = () => {
+    return (
+      <div className="popUp">
+        <div className="addAccount">
+          <h2>Are you sure you want to delete?</h2>
+          <div className="transactionError">{error}</div>
+
+          <button onClick={handleDeleteAccount}>Confirm</button>
+          <button onClick={() => setDeletePopup(false)}>Cancel</button>
+        </div>
+      </div>
+    );
+  };
+
+  const getAddAccountPopupJSX = () => {
+    return (
+      <div className="popUp">
+        <div className="addAccount">
+          <h2>Enter details</h2>
+          <div className="transactionError">{error}</div>
+          <input
+            placeholder="Cash (optional)"
+            value={cash}
+            onChange={(e) => setCash(e.target.value)}
+            type="number"
+          />
+          <input
+            placeholder="Credit (optional)"
+            value={credit}
+            onChange={(e) => setCredit(e.target.value)}
+            type="number"
+          />
+          <button onClick={handleAddAccount}>Confirm</button>
+          <button
+            onClick={() => {
+              setAddAccountPopup(false);
+              setCash("");
+              setCredit("");
+              setError("");
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const getDepositPopupJSX = () => {
+    return (
+      <div className="popUp">
+        <div className="deposit">
+          <h2>Enter amount to deposit</h2>
+          <div className="transactionError">{error}</div>
+          <input
+            placeholder="Amount"
+            value={proccessAmount}
+            onChange={(e) => setProccessAmount(e.target.value)}
+            type="number"
+          />
+          <button onClick={handleDeposit}>Confirm</button>
+          <button
+            onClick={() => {
+              setDepositPopup(false);
+              setProccessAmount("");
+              setError("");
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const getWithdrawPopupJSX = () => {
+    return (
+      <div className="popUp">
+        <div className="withdraw">
+          <h2>Enter amount to withdraw</h2>
+          <div className="transactionError">{error}</div>
+          <input
+            placeholder="Amount"
+            value={proccessAmount}
+            onChange={(e) => setProccessAmount(e.target.value)}
+            type="number"
+          />
+          <button onClick={handleWithdraw}>Confirm</button>
+          <button
+            onClick={() => {
+              setWithdrawPopup(false);
+              setProccessAmount("");
+              setError("");
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const getTransferPopupJSX = () => {
+    return (
+      <div className="popUp">
+        <div className="transfer">
+          <h2>Enter amount to transfer and destination account</h2>
+          <div className="transactionError">{error}</div>
+          <input
+            placeholder="Amount"
+            value={proccessAmount}
+            onChange={(e) => setProccessAmount(e.target.value)}
+            type="number"
+          />
+          <input
+            placeholder="Destination ID"
+            value={destinationID}
+            onChange={(e) => setDestinationID(e.target.value)}
+            type="text"
+          />
+          <button onClick={handleTransfer}>Confirm</button>
+          <button
+            onClick={() => {
+              setTransferPopup(false);
+              setProccessAmount("");
+              setDestinationID("");
+              setError("");
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  if (!currentUser && !isSpinning) {
+    return <Redirect to="/Login" />;
   }
 
   return (
     <div className="profileContainer">
-      {deletePopup && (
-        <div className="popUp">
-          <div className="addAccount">
-            <h2>Are you sure you want to delete?</h2>
-            <div className="transactionError">{error}</div>
-
-            <button onClick={handleDeleteAccount}>Confirm</button>
-            <button onClick={() => setDeletePopup(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
-      {addAccountPopup && (
-        <div className="popUp">
-          <div className="addAccount">
-            <h2>Enter details</h2>
-            <div className="transactionError">{error}</div>
-            <input
-              placeholder="Cash (optional)"
-              value={cash}
-              onChange={(e) => setCash(e.target.value)}
-              type="number"
-            />
-            <input
-              placeholder="Credit (optional)"
-              value={credit}
-              onChange={(e) => setCredit(e.target.value)}
-              type="number"
-            />
-            <button onClick={handleAddAccount}>Confirm</button>
+      {!isSpinning && (
+        <>
+          {deletePopup && getDeletePopupJSX()}
+          {addAccountPopup && getAddAccountPopupJSX()}
+          {depositPopup && getDepositPopupJSX()}
+          {withdrawPopup && getWithdrawPopupJSX()}
+          {transferPopup && getTransferPopupJSX()}
+          <div className="userLeft">{getUserJSX()}</div>
+          <div className="accountsRight">
+            <h1>My Accounts</h1>
             <button
-              onClick={() => {
-                setAddAccountPopup(false);
-                setCash("");
-                setCredit("");
-                setError("");
-              }}
+              onClick={() => setAddAccountPopup(true)}
+              className="addAccountBtn"
             >
-              Cancel
+              Add Account
             </button>
+            <div className="userAccounts">{getUserAccountsJSX()}</div>
           </div>
-        </div>
+        </>
       )}
-      {depositPopup && (
-        <div className="popUp">
-          <div className="deposit">
-            <h2>Enter amount to deposit</h2>
-            <div className="transactionError">{error}</div>
-            <input
-              placeholder="Amount"
-              value={proccessAmount}
-              onChange={(e) => setProccessAmount(e.target.value)}
-              type="number"
-            />
-            <button onClick={handleDeposit}>Confirm</button>
-            <button
-              onClick={() => {
-                setDepositPopup(false);
-                setProccessAmount("");
-                setError("");
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-      {withdrawPopup && (
-        <div className="popUp">
-          <div className="withdraw">
-            <h2>Enter amount to withdraw</h2>
-            <div className="transactionError">{error}</div>
-            <input
-              placeholder="Amount"
-              value={proccessAmount}
-              onChange={(e) => setProccessAmount(e.target.value)}
-              type="number"
-            />
-            <button onClick={handleWithdraw}>Confirm</button>
-            <button
-              onClick={() => {
-                setWithdrawPopup(false);
-                setProccessAmount("");
-                setError("");
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-      {transferPopup && (
-        <div className="popUp">
-          <div className="transfer">
-            <h2>Enter amount to transfer and destination account</h2>
-            <div className="transactionError">{error}</div>
-            <input
-              placeholder="Amount"
-              value={proccessAmount}
-              onChange={(e) => setProccessAmount(e.target.value)}
-              type="number"
-            />
-            <input
-              placeholder="Destination ID"
-              value={destinationID}
-              onChange={(e) => setDestinationID(e.target.value)}
-              type="text"
-            />
-            <button onClick={handleTransfer}>Confirm</button>
-            <button
-              onClick={() => {
-                setTransferPopup(false);
-                setProccessAmount("");
-                setDestinationID("");
-                setError("");
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-      <div className="userLeft">{getUserJSX()}</div>
-      <div className="accountsRight">
-        <h1>My Accounts</h1>
-        <button
-          onClick={() => setAddAccountPopup(true)}
-          className="addAccountBtn"
-        >
-          Add Account
-        </button>
-        <div className="userAccounts">{getUserAccounts()}</div>
-      </div>
     </div>
   );
 }

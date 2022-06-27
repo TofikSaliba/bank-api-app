@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 
 import { useData } from "../../contexts/DataContext";
@@ -10,7 +10,14 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { currentUser, setCurrentUser, setToken } = useData();
+  const { currentUser, setCurrentUser, setToken, isSpinning, setIsSpinning } =
+    useData();
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsSpinning(false);
+    }, 1000);
+  }, [setIsSpinning]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,33 +37,37 @@ function Login() {
     }
   };
 
-  if (currentUser) {
+  if (currentUser && !isSpinning) {
     return <Redirect to="/" />;
   }
 
   return (
     <form onSubmit={handleSubmit} className="loginForm">
-      <h1>Login</h1>
-      <div className="inputAndLabel">
-        <label htmlFor="email">Email</label>
-        <input
-          value={email}
-          id="email"
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-        />
-      </div>
-      <div className="inputAndLabel">
-        <label htmlFor="password">Password</label>
-        <input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          id="password"
-          type="password"
-        />
-      </div>
-      <div className="error">{error}</div>
-      <button type="submit">Login</button>
+      {!isSpinning && (
+        <>
+          <h1>Login</h1>
+          <div className="inputAndLabel">
+            <label htmlFor="email">Email</label>
+            <input
+              value={email}
+              id="email"
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+            />
+          </div>
+          <div className="inputAndLabel">
+            <label htmlFor="password">Password</label>
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              id="password"
+              type="password"
+            />
+          </div>
+          <div className="error">{error}</div>
+          <button type="submit">Login</button>
+        </>
+      )}
     </form>
   );
 }

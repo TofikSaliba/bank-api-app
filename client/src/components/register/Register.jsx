@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 
 import { useData } from "../../contexts/DataContext";
@@ -13,7 +13,14 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
-  const { currentUser, setCurrentUser, setToken } = useData();
+  const { currentUser, setCurrentUser, setToken, isSpinning, setIsSpinning } =
+    useData();
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsSpinning(false);
+    }, 1000);
+  }, [setIsSpinning]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,65 +49,69 @@ function Register() {
     }
   };
 
-  if (currentUser) {
+  if (currentUser && !isSpinning) {
     return <Redirect to="/" />;
   }
 
   return (
     <form onSubmit={handleSubmit} className="registerForm">
-      <h1>Register an account</h1>
-      <div className="inputAndLabel">
-        <label htmlFor="name">Full Name</label>
-        <input
-          value={name}
-          id="name"
-          onChange={(e) => setName(e.target.value)}
-          type="text"
-          required
-        />
-      </div>
-      <div className="inputAndLabel">
-        <label htmlFor="passport">PassportID</label>
-        <input
-          value={passportID}
-          onChange={(e) => setPassportID(e.target.value)}
-          id="passport"
-          type="text"
-          required
-        />
-      </div>
-      <div className="inputAndLabel">
-        <label htmlFor="email">Email</label>
-        <input
-          value={email}
-          id="email"
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          required
-        />
-      </div>
-      <div className="inputAndLabel">
-        <label htmlFor="password">Password</label>
-        <input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          id="password"
-          type="password"
-          required
-        />
-      </div>
-      <div className="inputAndLabel">
-        <label htmlFor="confirm">Confirm password</label>
-        <input
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          id="confirm"
-          type="password"
-        />
-      </div>
+      {!isSpinning && (
+        <>
+          <h1>Register an account</h1>
+          <div className="inputAndLabel">
+            <label htmlFor="name">Full Name</label>
+            <input
+              value={name}
+              id="name"
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+              required
+            />
+          </div>
+          <div className="inputAndLabel">
+            <label htmlFor="passport">PassportID</label>
+            <input
+              value={passportID}
+              onChange={(e) => setPassportID(e.target.value)}
+              id="passport"
+              type="text"
+              required
+            />
+          </div>
+          <div className="inputAndLabel">
+            <label htmlFor="email">Email</label>
+            <input
+              value={email}
+              id="email"
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              required
+            />
+          </div>
+          <div className="inputAndLabel">
+            <label htmlFor="password">Password</label>
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              id="password"
+              type="password"
+              required
+            />
+          </div>
+          <div className="inputAndLabel">
+            <label htmlFor="confirm">Confirm password</label>
+            <input
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              id="confirm"
+              type="password"
+            />
+          </div>
 
-      <div className="error">{error}</div>
-      <button type="submit">Register</button>
+          <div className="error">{error}</div>
+          <button type="submit">Register</button>
+        </>
+      )}
     </form>
   );
 }

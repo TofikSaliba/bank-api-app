@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
@@ -12,8 +12,7 @@ import API from "./api/api.js";
 import "./app.css";
 
 function App() {
-  const { setCurrentUser, setToken } = useData();
-  const [loading, setLoading] = useState(true);
+  const { setCurrentUser, setToken, isSpinning, setIsSpinning } = useData();
 
   useEffect(() => {
     const storedToken = JSON.parse(localStorage.getItem("bankToken"));
@@ -28,11 +27,13 @@ function App() {
           setToken(storedToken);
         } catch (err) {
           console.log(err.message);
+        } finally {
+          setIsSpinning(false);
         }
       };
       getUser();
     }
-    setLoading(false);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -41,15 +42,13 @@ function App() {
       <Router>
         <Header />
         <div className="mainContainer">
-          {loading && <h1>Loading</h1>}
-          {!loading && (
-            <Switch>
-              <Route exact path="/" component={Home} />
-              <Route exact path="/profile" component={Profile} />
-              <Route exact path="/Login" component={Login} />
-              <Route exact path="/Register" component={Register} />
-            </Switch>
-          )}
+          {isSpinning && <h1 className="spinner">Loading</h1>}
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route exact path="/profile" component={Profile} />
+            <Route exact path="/Login" component={Login} />
+            <Route exact path="/Register" component={Register} />
+          </Switch>
         </div>
       </Router>
     </>
